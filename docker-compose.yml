@@ -4,8 +4,9 @@ services:
     image: postgres:13
     ports:
       - 5434:5432
+      # localhost:container
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: nhatcapdang
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
     networks:
@@ -15,7 +16,7 @@ services:
     ports:
       - 5435:5432
     environment:
-      POSTGRES_USER: postgres
+      POSTGRES_USER: nhatcapdang
       POSTGRES_PASSWORD: 123
       POSTGRES_DB: nest
     networks:
