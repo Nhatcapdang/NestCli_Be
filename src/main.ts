@@ -7,6 +7,7 @@ async function bootstrap() {
   console.log('running on port localhost:3001');
   app.useGlobalPipes(
     new ValidationPipe({
+      // field dont have in dto will be remove from request BE
       whitelist: true,
     }),
   );
