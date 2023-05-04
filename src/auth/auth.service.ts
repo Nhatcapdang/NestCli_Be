@@ -3,16 +3,13 @@ import {
   Injectable,
 } from '@nestjs/common';
 // import { User, Bookmark } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { AuthDto } from './dto';
 import * as argon from 'argon2';
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 @Injectable()
 export class AuthService {
   constructor(
-    private prisma: PrismaService,
     private jwt: JwtService,
     // get env
     private config: ConfigService,
@@ -22,23 +19,11 @@ export class AuthService {
     const hash = await argon.hash(dto.password);
     try {
       // save the new user in the db
-      const user = await this.prisma.user.create({
-        data: {
-          email: dto.email,
-          hash,
-        },
-        // select: {
-        //   id: true,
-        //   email: true,
-        // },
-      });
+      const user = dto;
       console.log('signup ser', dto, user, hash);
-      return this.signToken(user.id, user.email);
+      return this.signToken(1, user.email);
     } catch (error) {
-      if (
-        error instanceof
-        PrismaClientKnownRequestError
-      ) {
+      if (error) {
         if (error.code === 'P2002') {
           throw new ForbiddenException(
             'Credentials taken',
@@ -51,12 +36,8 @@ export class AuthService {
   async signIn(dto: AuthDto) {
     // find the user by email
     console.log('signin', dto);
-    const user =
-      await this.prisma.user.findUnique({
-        where: {
-          email: dto.email,
-        },
-      });
+    const user = dto;
+
     // if user does not exist throw exception
     // ForbiddenException(1111);
     //     {
@@ -71,7 +52,7 @@ export class AuthService {
 
     // compare password
     const pwMatches = await argon.verify(
-      user.hash,
+      'user.hash',
       dto.password,
     );
     // if password incorrect throw exception
@@ -79,7 +60,7 @@ export class AuthService {
       throw new ForbiddenException(
         'Credentials incorrect',
       );
-    return this.signToken(user.id, user.email);
+    return this.signToken(1, user.email);
   }
   async signToken(
     userId: number,

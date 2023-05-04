@@ -5,17 +5,13 @@ import {
   ExtractJwt,
   Strategy,
 } from 'passport-jwt';
-import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(
   Strategy,
   'user-jwt', // define strategy name is jwt
 ) {
-  constructor(
-    config: ConfigService,
-    private prisma: PrismaService,
-  ) {
+  constructor(config: ConfigService) {
     super({
       jwtFromRequest:
         ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -27,13 +23,7 @@ export class JwtStrategy extends PassportStrategy(
     sub: number;
     email: string;
   }) {
-    const user =
-      await this.prisma.user.findUnique({
-        where: {
-          id: payload.sub,
-        },
-      });
-    delete user.hash;
+    const user = payload;
     return user;
   }
 }
