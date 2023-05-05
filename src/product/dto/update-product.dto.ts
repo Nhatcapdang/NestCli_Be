@@ -3,7 +3,7 @@ import {
   IsString,
 } from 'class-validator';
 
-export class CreateProductDto {
+export class UpdateProductDto {
   @IsString()
   readonly name: string;
   @IsNumberString()
