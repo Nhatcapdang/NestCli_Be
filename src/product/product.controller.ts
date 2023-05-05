@@ -9,51 +9,47 @@ import {
 } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { Product } from './schemas/product.schemas';
-import {
-  CreateProductDto,
-  UpdateProductDto,
-} from './dto';
+import { CreateProductDto, UpdateProductDto } from './dto';
+import { ApiCreatedResponse, ApiTags } from '@nestjs/swagger/dist';
 
+@ApiTags('Products')
 @Controller('product')
 export class ProductController {
-  constructor(
-    private productService: ProductService,
-  ) {}
+  constructor(private productService: ProductService) {}
   @Get()
   async findAll() {
     return this.productService.findAll();
   }
 
   @Post()
-  async createProduct(
+  @ApiCreatedResponse({
+    description: 'The record has been successfully created.',
+    type: Product,
+  })
+  createProduct(
     @Body()
     product: CreateProductDto,
   ): Promise<Product> {
-    return this.productService.createProduct(
-      product,
-    );
+    return this.productService.createProduct(product);
   }
 
   @Get(':id')
-  async getProductId(@Param('id') id: string) {
+  getProductId(@Param('id') id: string) {
     return this.productService.getProductId(id);
   }
 
   @Put(':id')
-  async updateProduct(
+  updateProduct(
     @Param('id')
     id: string,
     @Body()
     product: UpdateProductDto,
   ): Promise<Product> {
-    return this.productService.updateProduct(
-      id,
-      product,
-    );
+    return this.productService.updateProduct(id, product);
   }
 
   @Delete(':id')
-  async deleteProduct(
+  deleteProduct(
     @Param('id')
     id: string,
   ): Promise<Product> {
