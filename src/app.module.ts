@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
 import { ConfigModule } from '@nestjs/config';
-import { JwtStrategy } from './auth/strategy';
+import { FacebookStrategy, JwtStrategy } from './auth/strategy';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -22,6 +22,6 @@ import { ProductModule } from './product/product.module';
     ProductModule,
   ],
   controllers: [AppController, UserController],
-  providers: [AppService, JwtStrategy],
+  providers: [AppService, JwtStrategy, FacebookStrategy],
 })
 export class AppModule {}
