@@ -4,11 +4,14 @@ import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { BookmarkModule } from './bookmark/bookmark.module';
 import { ConfigModule } from '@nestjs/config';
-import { FacebookStrategy, JwtStrategy } from './auth/strategy';
+import { JwtStrategy } from './auth/strategy';
 import { UserController } from './user/user.controller';
 import { UserModule } from './user/user.module';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ProductModule } from './product/product.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { TransformInterceptor } from './interceptors/index.Interceptors';
+// import { PassportModule } from '@nestjs/passport';
 @Module({
   imports: [
     // https://docs.nestjs.com/techniques/configuration
@@ -22,6 +25,13 @@ import { ProductModule } from './product/product.module';
     ProductModule,
   ],
   controllers: [AppController, UserController],
-  providers: [AppService, JwtStrategy, FacebookStrategy],
+  providers: [
+    AppService,
+    JwtStrategy,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: TransformInterceptor,
+    },
+  ],
 })
 export class AppModule {}

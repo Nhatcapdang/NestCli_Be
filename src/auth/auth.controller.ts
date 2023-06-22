@@ -11,6 +11,8 @@ import {
 } from '@nestjs/common';
 import { AuthDto, Facebook } from './dto';
 import { AuthGuard } from '@nestjs/passport';
+import { GoogleGuard } from './guard';
+import { Users } from './schemas/users.schemas';
 
 @Controller('auth')
 export class AuthController {
@@ -42,11 +44,29 @@ export class AuthController {
   @UseGuards(AuthGuard('facebook'))
   async facebookLoginRedirect(
     @Req()
-    req: Facebook,
-  ): Promise<any> {
-    return {
-      statusCode: HttpStatus.OK,
-      data: req.user,
-    };
+    req: {
+      user: Facebook;
+    },
+  ): Promise<Users> {
+    return this.authService.signGgOrFb(req);
+  }
+
+  @Get('/google')
+  @UseGuards(GoogleGuard)
+  // @UseGuards(AuthGuard('google'))
+  async googleLogin(): Promise<any> {
+    return HttpStatus.OK;
+  }
+
+  @Get('/google/redirect')
+  @UseGuards(GoogleGuard)
+  // @UseGuards(AuthGuard('google'))
+  async googleLoginRedirect(
+    @Req()
+    req: {
+      user: Facebook;
+    },
+  ): Promise<Users> {
+    return this.authService.signGgOrFb(req);
   }
 }

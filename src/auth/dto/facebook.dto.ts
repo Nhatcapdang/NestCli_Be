@@ -1,13 +1,6 @@
-import {
-  IsEmail,
-  IsNotEmpty,
-  IsObject,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
 
-class PropertyUser {
+export class Facebook {
   @IsEmail()
   @IsNotEmpty()
   email: string;
@@ -15,13 +8,6 @@ class PropertyUser {
   firstName: string;
   @IsString()
   lastName: string;
-}
-export class Facebook {
-  @IsObject()
-  @ValidateNested()
-  @Type(() => PropertyUser)
-  user: PropertyUser;
-
   @IsString()
   accessToken: string;
 }

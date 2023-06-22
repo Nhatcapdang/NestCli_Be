@@ -1,8 +1,4 @@
-import {
-  Prop,
-  Schema,
-  SchemaFactory,
-} from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 
 @Schema({
   timestamps: true,
@@ -14,5 +10,4 @@ export class Product {
   @Prop()
   price: number;
 }
-export const ProductSchema =
-  SchemaFactory.createForClass(Product);
+export const ProductSchema = SchemaFactory.createForClass(Product);
