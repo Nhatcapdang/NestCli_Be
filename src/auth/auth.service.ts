@@ -17,20 +17,37 @@ export class AuthService {
     private users: Model<Users>,
   ) {}
   async signUp(dto: AuthDto) {
-    // generate the password hash
-    const hash = await argon.hash(dto.password);
-    try {
+    const user = await this.users.findOne({ 'user.email': dto.email });
+    if (user) {
+      return {
+        message: 'Email already exists',
+      };
+    } else {
+      // generate the password hash
+      const hash = await argon.hash(dto.password);
       // save the new user in the db
-      const user = dto;
-      console.log('signup ser', dto, user, hash);
-      return this.signToken(1, user.email);
-    } catch (error) {
-      if (error) {
-        if (error.code === 'P2002') {
-          throw new ForbiddenException('Credentials taken');
-        }
-      }
-      throw error;
+      const { _id, user } = await this.users.create({
+        user: {
+          email: dto.email,
+          password: hash,
+        },
+      });
+      const tokens = await this.getTokens(_id, dto.email);
+      const res = await this.users.findOneAndUpdate(
+        _id,
+        {
+          user: {
+            ...user,
+            ...tokens,
+          },
+        },
+        {
+          returnDocument: 'after',
+        },
+      );
+      console.log('res', res);
+      delete res.user.password;
+      return res;
     }
   }
   async signIn(dto: AuthDto) {
@@ -74,7 +91,7 @@ export class AuthService {
   }
 
   async signGgOrFb(dto: { user: Facebook }): Promise<Users> {
-    const user = await this.users.findOne({ email: dto.user.email });
+    const user = await this.users.findOne({ 'user.email': dto.user.email });
     console.log('user', dto.user.email, user);
     if (user) {
       return user;
@@ -82,5 +99,28 @@ export class AuthService {
       const res = await this.users.create(dto);
       return res;
     }
+  }
+
+  async getTokens(userId: number, email: string): Promise<any> {
+    const jwtPayload = {
+      sub: userId,
+      email: email,
+    };
+
+    const [at, rt] = await Promise.all([
+      this.jwt.signAsync(jwtPayload, {
+        secret: this.config.get<string>('AT_SECRET'),
+        expiresIn: '15m',
+      }),
+      this.jwt.signAsync(jwtPayload, {
+        secret: this.config.get<string>('RT_SECRET'),
+        expiresIn: '7d',
+      }),
+    ]);
+
+    return {
+      accessToken: at,
+      refreshToken: rt,
+    };
   }
 }
